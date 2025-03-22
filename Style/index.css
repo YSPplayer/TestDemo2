@@ -1,0 +1,27 @@
+*  {
+    margin: 0;
+    padding: 0;
+    /*
+     content-box：元素的宽度/高度不包括内边距和边框
+     border-box：元素的宽度/高度包括内边距和边框    
+    */
+    box-sizing: border-box;
+}
+ /* 或使用响应式方法 */
+  html {
+    font-size: 10px; /* 默认大小 */
+  }
+/*1rem = 10px*/
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #F3F1F1;
+    z-index: -1;
+}
+#title {
+
+    
+}
