@@ -1,22 +1,24 @@
 <template>
   <div id="app">
-    <router-view />
+    <header-nav />
+    <main class="container">
+      <router-view />
+    </main>
+    <footer-bar />
   </div>
 </template>
 
 <script>
+import HeaderNav from './components/HeaderNav.vue'
+import FooterBar from './components/FooterBar.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: { HeaderNav, FooterBar }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+#app{min-height:100vh;display:flex;flex-direction:column}
+main.container{flex:1}
 </style>

@@ -1,0 +1,16 @@
+@import './variables.css';
+
+/* Element Plus overrides using theme variables */
+body{background:var(--bg);color:var(--text)}
+
+
+.el-button--primary{background-color:var(--primary);border-color:var(--primary);color:var(--surface);font-size:var(--fs-sm)}
+.el-button{font-size:var(--fs-sm)}
+
+.el-input__inner, .el-textarea__inner{background:var(--surface);color:var(--text);border-color:var(--border);font-size:var(--fs-md)}
+
+.el-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:var(--fs-md)}
+
+.app-header{background:var(--surface);border-bottom:1px solid var(--border)}
+.app-footer{background:var(--surface);border-top:1px solid var(--border)}
+
