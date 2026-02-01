@@ -11,5 +11,6 @@ export default {
 </script>
 
 <style scoped>
-.base-input ::v-deep .el-input__inner{border-radius:6px;font-size:var(--fs-md);padding:10px}
+.base-input ::v-deep .el-input__inner{border-radius:12px;font-size:var(--fs-md);padding:10px 14px;height:40px}
+.base-input ::v-deep .el-textarea__inner{border-radius:12px;font-size:var(--fs-md);padding:10px 14px}
 </style>

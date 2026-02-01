@@ -7,10 +7,27 @@ body{background:var(--bg);color:var(--text)}
 .el-button--primary{background-color:var(--primary);border-color:var(--primary);color:var(--surface);font-size:var(--fs-sm)}
 .el-button{font-size:var(--fs-sm)}
 
-.el-input__inner, .el-textarea__inner{background:var(--surface);color:var(--text);border-color:var(--border);font-size:var(--fs-md)}
+/* Unified button visuals using tokens */
+.el-button.base-button{border-radius:var(--btn-radius);padding:var(--btn-padding-regular);transition:all .18s ease;box-shadow:none;font-size:var(--fs-md);min-width:var(--btn-min-width);font-weight:600;display:inline-flex;align-items:center}
+.el-button.base-button.el-button--small{padding:var(--btn-padding-small);font-size:var(--fs-sm);min-width:120px}
+.el-button.base-button.el-button--default,.el-button.base-button:not(.el-button--primary){background:transparent;border-color:var(--border);color:var(--text)}
+
+/* primary button: use black shades on hover/active */
+.el-button.base-button.el-button--primary{background-color:var(--primary);border-color:var(--primary);color:var(--surface);box-shadow:var(--btn-shadow)}
+.el-button.base-button.el-button--primary:hover{background-color:var(--primary-hover);border-color:var(--primary-hover);box-shadow:var(--btn-hover-shadow);transform:translateY(-1px)}
+.el-button.base-button.el-button--primary:active{background-color:var(--primary-pressed);border-color:var(--primary-pressed);transform:translateY(0)}
+
+/* plain buttons: subtle black hover background */
+.el-button.base-button.is-plain:hover{background:var(--plain-hover-bg);color:var(--text)}
+
+/* larger size support */
+.el-button.base-button.el-button--medium{padding:var(--btn-padding-regular)}
+.el-button.base-button.el-button--large{padding:var(--btn-padding-large);font-size:var(--fs-lg)}
+
+.el-input__inner, .el-textarea__inner{background:var(--surface);color:var(--text);border-color:var(--border);font-size:var(--fs-md);padding:10px 14px;border-radius:12px;height:40px}
 
 .el-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:var(--fs-md)}
 
-.app-header{background:var(--surface);border-bottom:1px solid var(--border)}
+.app-header{background:var(--surface);border-bottom:1px solid transparent}
 .app-footer{background:var(--surface);border-top:1px solid var(--border)}
 

@@ -6,7 +6,7 @@
           <div class="card">
               <div class="flex flex-between">
                 <h2 class="title-reset">论坛</h2>
-                <el-button type="primary" size="small">发新帖</el-button>
+                <base-button type="primary">发新帖</base-button>
               </div>
             <post-list class="list-gap" />
           </div>
@@ -30,12 +30,14 @@
 import TopicList from '../components/TopicList.vue';
 import UserList from '../components/UserList.vue';
 import PostList from '../components/PostList.vue';
+import BaseButton from '../components/ui/BaseButton.vue';
 
 export default {
   components: {
     TopicList,
     UserList,
-    PostList
+    PostList,
+    BaseButton
   }
 }
 </script>

@@ -12,5 +12,5 @@ export default {
 </script>
 
 <style scoped>
-.base-card{padding:var(--space-md);border-radius:var(--radius);font-size:var(--fs-md)}
+.base-card{padding:var(--space-lg);border-radius:var(--radius);font-size:var(--fs-md)}
 </style>

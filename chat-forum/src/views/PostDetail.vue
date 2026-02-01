@@ -7,7 +7,7 @@
             <div class="text-muted small">作者 • 2026-02-01</div>
           </div>
           <div>
-            <base-button size="small">收藏</base-button>
+            <base-button>收藏</base-button>
           </div>
         </div>
         <div class="mt-md">

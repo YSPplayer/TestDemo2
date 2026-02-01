@@ -9,25 +9,38 @@
   --radius: 8px;
   /* spacing scale */
   --space-0: 0px;
-  --space-xs: 4px;   /* 1 */
-  --space-sm: 8px;   /* 2 */
-  --space-md: 16px;  /* 3 */
-  --space-lg: 24px;  /* 4 */
-  --space-xl: 32px;  /* 5 */
+  --space-xs: 6px;   /* 1 */
+  --space-sm: 12px;  /* 2 */
+  --space-md: 20px;  /* 3 */
+  --space-lg: 32px;  /* 4 */
+  --space-xl: 48px;  /* 5 */
 
-  /* typography */
-  --fs-xs: 12px;
-  --fs-sm: 13px;
-  --fs-md: 15px;
-  --fs-lg: 18px;
-  --fs-xl: 22px;
-  --line-height-sm: 1.3;
-  --line-height-md: 1.6;
+  /* typography - 更大的字号 */
+  --fs-xs: 14px;
+  --fs-sm: 16px;
+  --fs-md: 18px;
+  --fs-lg: 22px;
+  --fs-xl: 32px;
+  --line-height-sm: 1.45;
+  --line-height-md: 1.7;
 
   /* breakpoints */
   --bp-sm: 600px;
   --bp-md: 900px;
   --bp-lg: 1200px;
+  /* button tokens - DeepSeek 标准尺寸 */
+  --btn-radius: 14px;
+  --btn-padding-regular: 12px 36px;
+  --btn-padding-small: 10px 28px;
+  --btn-padding-large: 14px 44px;
+  --btn-min-width: 140px;
+  --btn-shadow: 0 8px 20px rgba(17,17,17,0.08);
+  --btn-hover-shadow: 0 12px 28px rgba(17,17,17,0.12);
+  --primary-hover: #000000;
+  --primary-pressed: rgba(0,0,0,0.9);
+  --plain-hover-bg: rgba(0,0,0,0.04);
+  /* header sizing */
+  --header-height: 64px;
 }
 
 @media (prefers-color-scheme: dark){

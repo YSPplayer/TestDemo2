@@ -4,8 +4,8 @@
     <div class="flex flex-between mt-sm justify-end">
       <div></div>
       <div class="flex gap-sm">
-        <base-button size="small">取消</base-button>
-        <base-button type="primary" size="small">提交</base-button>
+        <base-button>取消</base-button>
+        <base-button type="primary">提交</base-button>
       </div>
     </div>
   </div>
