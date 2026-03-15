@@ -1,1 +1,5 @@
 chat-forum/node_modules/
+engine/src-tauri/icons/
+engine/target/
+engine/icons/
+.vscode/
