@@ -11,26 +11,19 @@ export default class DrawManager {
      constructor(scene:Phaser.Scene) {
         this.scene = scene;
     }
+    drawLine(height:number, x1:number,y1:number,x2:number,y2:number,color:string) {
+        const graphics = this.scene.add.graphics();
+        graphics.lineStyle(height, Util.ToColor(color)); 
+        graphics.moveTo(x1, y1);  // 起点
+        graphics.lineTo(x2, y2);  // 终点
+        graphics.strokePath();    // 绘制
+    }
     //场地中每一行的组件
     drawFieldLine(rect:Rect) {
         const scene = this.scene;
         const fieldLineBox = scene.add.rectangle(rect.x, rect.y, rect.width, rect.height,
                  Util.ToColor('#8acfe6'));
         fieldLineBox.setOrigin(0, 0);
-        const borderWidth = 2;
-        const graphics = scene.add.graphics();
-        graphics.lineStyle(2, Util.ToColor('#ffffff'));
-        // 上边框
-        graphics.beginPath();
-        graphics.moveTo(borderWidth, borderWidth);
-        graphics.lineTo(rect.width - borderWidth, borderWidth);
-        graphics.strokePath();
-
-        // 下边框
-        graphics.beginPath();
-        graphics.moveTo(borderWidth, rect.height - borderWidth);
-        graphics.lineTo(rect.width - borderWidth, rect.height - borderWidth);
-        graphics.strokePath();
     }
     drawField(rect:Rect)  {
          const scene = this.scene;
@@ -44,12 +37,14 @@ export default class DrawManager {
         const fieldWidthBox = scene.add.rectangle(x, y, fieldWidth, fieldHeight,
               Util.ToColor('#e85939'));
          fieldWidthBox.setOrigin(0, 0);
-         const lineHeight = fieldHeight / 6;
+         const midlineheight = 2;
+         const lineHeight = fieldHeight / 6 - 5 * midlineheight;
          const lineWidth = fieldWidth;
          for(let i = 0; i < 6; i++) {
             const lineX = x;
-            const lineY = y + i * lineHeight;
+            const lineY = y + i * lineHeight + i * midlineheight;
             this.drawFieldLine({ x: lineX, y: lineY, width: lineWidth, height: lineHeight });
+            this.drawLine(midlineheight, lineX, lineY + lineHeight, lineX + lineWidth, lineY + lineHeight, '#ffffff');
         }
     }
      //单人物框
