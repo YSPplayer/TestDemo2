@@ -31,20 +31,21 @@ export default class DrawManager {
         const height = scene.scale.height;
         const rightWidth = width - rect.x - rect.width;
         const rightX = rect.x + rect.width;
-        const rightBox = scene.add.rectangle(rightX, rect.y, rightWidth, height,
+        const rightHeight = height - rect.y;
+        const rightBox = scene.add.rectangle(rightX, rect.y, rightWidth, rightHeight,
               Util.ToColor('#54b985'));
          rightBox.setOrigin(0, 0);
          
          // 计算第3条分隔线的y位置（与drawField中的第3条分隔线对齐）
          // drawField中的分隔线计算：lineY = y + i * (lineHeight + midlineheight)
          // 第3条分隔线（i=2）的位置：separatorY = lineY + lineHeight = y + 2 * (lineHeight + midlineheight) + lineHeight
-         const fieldHeight = height;
+         const fieldHeight = rightHeight;
          const midlineheight = 2;
          const numLines = 6;
          const numSeparators = numLines - 1; // 5条分隔线
          const lineHeight = (fieldHeight - numSeparators * midlineheight) / numLines;
          // 第3条分隔线的y位置（索引为2）
-         const thirdSeparatorY = 2 * (lineHeight + midlineheight) + lineHeight;
+         const thirdSeparatorY = rect.y + 2 * (lineHeight + midlineheight) + lineHeight;
          
          // 绘制分割线（2px宽，白色）
          const separatorLine = scene.add.rectangle(
@@ -57,8 +58,8 @@ export default class DrawManager {
          separatorLine.setOrigin(0, 0);
          
          // 计算上下两个区域
-         const topAreaHeight = thirdSeparatorY;
-         const bottomAreaHeight = height - thirdSeparatorY - midlineheight;
+         const topAreaHeight = thirdSeparatorY - rect.y;
+         const bottomAreaHeight = rightHeight - topAreaHeight - midlineheight;
          
          // 矩形长宽比为1.45:1，即 height = width * 1.45（长度比宽度大）
          // 计算矩形尺寸，确保在容器内部
@@ -68,7 +69,7 @@ export default class DrawManager {
          const topRectWidth = Math.min(rightWidth * 0.8, topAreaHeight / aspectRatio * 0.9);
          const topRectHeight = topRectWidth * aspectRatio;
          const topRectX = rightX + (rightWidth - topRectWidth) / 2;
-         const topRectY = (topAreaHeight - topRectHeight) / 2;
+         const topRectY = rect.y + (topAreaHeight - topRectHeight) / 2;
          const topRect = scene.add.rectangle(
              topRectX,
              topRectY,
@@ -94,9 +95,9 @@ export default class DrawManager {
          
          return {
             x: rightX,
-            y: 0,
+            y: rect.y,
             width: rightWidth,
-            height: height
+            height: rightHeight
          }
     }
     drawField(rect:Rect):Rect  {
@@ -104,8 +105,7 @@ export default class DrawManager {
         const width = scene.scale.width;
         const height = scene.scale.height;
         const fieldWidth = width * 0.6;
-        const fieldHeight = height;
-        const margin = width * 0.01;
+        const fieldHeight = height - rect.y;
         const x =  rect.x + rect.width;
         const y = rect.y;
         const fieldWidthBox = scene.add.rectangle(x, y, fieldWidth, fieldHeight,
@@ -191,6 +191,22 @@ export default class DrawManager {
         const headerBox = scene.add.rectangle(x, y, headerWidth, headerHeight,
               Util.ToColor('#ce6bb5ff'));
         headerBox.setOrigin(0, 0);
+        
+        // 左侧矩形
+        const rectSize = headerHeight * 0.8;
+        const leftRectX = headerHeight * 0.1;
+        const leftRectY = headerHeight * 0.1;
+        const leftRect = scene.add.rectangle(leftRectX, leftRectY, rectSize, rectSize,
+              Util.ToColor('#ffffff'));
+        leftRect.setOrigin(0, 0);
+        
+        // 右侧矩形
+        const rightRectX = headerWidth - headerHeight * 0.1 - rectSize;
+        const rightRectY = headerHeight * 0.1;
+        const rightRect = scene.add.rectangle(rightRectX, rightRectY, rectSize, rectSize,
+              Util.ToColor('#ffffff'));
+        rightRect.setOrigin(0, 0);
+        
         return {
             x: x,
             y: y,
