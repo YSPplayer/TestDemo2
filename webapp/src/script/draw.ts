@@ -13,10 +13,9 @@ export default class DrawManager {
     }
     drawLine(height:number, x1:number,y1:number,x2:number,y2:number,color:string) {
         const graphics = this.scene.add.graphics();
-        graphics.lineStyle(height, Util.ToColor(color)); 
-        graphics.moveTo(x1, y1);  // 起点
-        graphics.lineTo(x2, y2);  // 终点
-        graphics.strokePath();    // 绘制
+        // 使用填充矩形而不是线条，确保完全覆盖，不留间隙
+        graphics.fillStyle(Util.ToColor(color));
+        graphics.fillRect(x1, y1 - height / 2, x2 - x1, height);
     }
     //场地中每一行的组件
     drawFieldLine(rect:Rect) {
@@ -38,13 +37,28 @@ export default class DrawManager {
               Util.ToColor('#e85939'));
          fieldWidthBox.setOrigin(0, 0);
          const midlineheight = 2;
-         const lineHeight = fieldHeight / 6 - 5 * midlineheight;
+         const numLines = 6;
+         const numSeparators = numLines - 1; // 5条分隔线
+         // 计算每个区域的高度，确保总高度正好等于 fieldHeight
+         const lineHeight = (fieldHeight - numSeparators * midlineheight) / numLines;
          const lineWidth = fieldWidth;
-         for(let i = 0; i < 6; i++) {
+         for(let i = 0; i < numLines; i++) {
             const lineX = x;
-            const lineY = y + i * lineHeight + i * midlineheight;
+            // 每个区域的 y 坐标：i * (lineHeight + midlineheight)
+            const lineY = y + i * (lineHeight + midlineheight);
             this.drawFieldLine({ x: lineX, y: lineY, width: lineWidth, height: lineHeight });
-            this.drawLine(midlineheight, lineX, lineY + lineHeight, lineX + lineWidth, lineY + lineHeight, '#ffffff');
+            // 分隔线：只在非最后一个区域下方绘制，使用矩形确保完全覆盖
+            if (i < numSeparators) {
+                const separatorY = lineY + lineHeight;
+                const separatorRect = scene.add.rectangle(
+                    lineX, 
+                    separatorY, 
+                    lineWidth, 
+                    midlineheight, 
+                    Util.ToColor('#ffffff')
+                );
+                separatorRect.setOrigin(0, 0);
+            }
         }
     }
      //单人物框
