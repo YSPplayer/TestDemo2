@@ -31,7 +31,7 @@ export default class DrawManager {
         const height = scene.scale.height;
         const rightWidth = width - rect.x - rect.width;
         const rightX = rect.x + rect.width;
-        const rightBox = scene.add.rectangle(rightX, 0, rightWidth, height,
+        const rightBox = scene.add.rectangle(rightX, rect.y, rightWidth, height,
               Util.ToColor('#54b985'));
          rightBox.setOrigin(0, 0);
          
@@ -99,15 +99,15 @@ export default class DrawManager {
             height: height
          }
     }
-    drawField(rect:Rect)  {
-         const scene = this.scene;
+    drawField(rect:Rect):Rect  {
+        const scene = this.scene;
         const width = scene.scale.width;
         const height = scene.scale.height;
-        const fieldWidth = width * 0.65;
+        const fieldWidth = width * 0.6;
         const fieldHeight = height;
         const margin = width * 0.01;
-        const x =  rect.x + rect.width + margin;
-        const y = 0;
+        const x =  rect.x + rect.width;
+        const y = rect.y;
         const fieldWidthBox = scene.add.rectangle(x, y, fieldWidth, fieldHeight,
               Util.ToColor('#e85939'));
          fieldWidthBox.setOrigin(0, 0);
@@ -161,47 +161,60 @@ export default class DrawManager {
             height: fieldHeight
         }
     }
-     //单人物框
-    drawCharacterBox(rect:Rect) {
+    drawPanelBox(rect:Rect):Rect {   
         const scene = this.scene;
         const width = scene.scale.width;
         const height = scene.scale.height;
-         const characterWidth = width * 0.1;
-         const margin = width * 0.01;
-         const characterHeight = characterWidth;
-         const x = rect.x + rect.width + margin;
-         const y = margin;
-         const characterBox = scene.add.rectangle(x, y, characterWidth, characterHeight,
-              Util.ToColor('#c2d370'));
-         characterBox.setOrigin(0, 0);
-         const endx = x;
-         const endy = height - y * 2 - characterHeight;
-         const endcharacterBox = scene.add.rectangle(endx, endy, characterWidth, characterHeight,
-              Util.ToColor('#c2d370'));
-         endcharacterBox.setOrigin(0, 0);
-         return {
+        const x = 0;
+        const y = rect.y + rect.height;
+        const panelWidth = width * 0.2;
+        const panelHeight = height;
+        const characterBox = scene.add.rectangle(x, y, panelWidth, panelHeight,
+              Util.ToColor('#cca7d7'));
+        characterBox.setOrigin(0, 0);
+        return {
             x: x,
             y: y,
-            width: characterWidth,
-            height: characterHeight
-         }
+            width: panelWidth,
+            height: panelHeight
         }
+    }
+    //标头ui
+    drawHeader():Rect {
+        const scene = this.scene;
+        const width = scene.scale.width;
+        const height = scene.scale.height;
+        const x = 0;
+        const y = 0;
+        const headerWidth = width;
+        const headerHeight = height * 0.1;
+        const headerBox = scene.add.rectangle(x, y, headerWidth, headerHeight,
+              Util.ToColor('#ce6bb5ff'));
+        headerBox.setOrigin(0, 0);
+        return {
+            x: x,
+            y: y,
+            width: headerWidth,
+            height: headerHeight
+        }
+    } 
     //左侧多人物框
-    drawCharacterSBox() {
+    drawCharacterSBox(rect:Rect):Rect {
         const scene = this.scene;
         const width = scene.scale.width;
         const height = scene.scale.height;
         const containerWidth = width * 0.1;
         const containerHeight = height;
-        
+        const x = rect.x + rect.width;
+        const y = rect.y;
         // 外框容器（可视区域）
-        const container = scene.add.rectangle(0, 0, containerWidth, containerHeight,
+        const container = scene.add.rectangle(x, y, containerWidth, containerHeight,
              Util.ToColor('#477496'));
         container.setOrigin(0, 0);
         container.setStrokeStyle(2, Util.ToColor('#e2e4bc'));
         
         // 创建可滚动的内容容器
-        const scrollContentContainer = scene.add.container(0, 0);
+        const scrollContentContainer = scene.add.container(x, y);
         
         const characterWidth = container.width * 0.8;
         const characterHeight = characterWidth;
@@ -209,9 +222,9 @@ export default class DrawManager {
         
         // 将所有矩形添加到内容容器中
         for(let i = 0; i < 6; i++) {
-            const x = margin;
-            const y = margin + i * (characterHeight + margin);
-            const characterBox = scene.add.rectangle(x, y, characterWidth, characterHeight,
+            const boxX = margin;
+            const boxY = margin + i * (characterHeight + margin);
+            const characterBox = scene.add.rectangle(boxX, boxY, characterWidth, characterHeight,
                  Util.ToColor('#72ca4d'));
             characterBox.setOrigin(0, 0);
             scrollContentContainer.add(characterBox);
@@ -220,7 +233,7 @@ export default class DrawManager {
         // 创建遮罩，限制可视区域为 container 的大小
         const maskGraphics = scene.make.graphics();
         maskGraphics.fillStyle(0xffffff);
-        maskGraphics.fillRect(0, 0, containerWidth, containerHeight);
+        maskGraphics.fillRect(x, y, containerWidth, containerHeight);
         const mask = new Phaser.Display.Masks.GeometryMask(scene, maskGraphics);
         scrollContentContainer.setMask(mask);
         
@@ -232,16 +245,16 @@ export default class DrawManager {
         // 添加鼠标滚轮事件
         scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any[], deltaX: number, deltaY: number) => {
             // 检查鼠标是否在滚动区域内
-            if (pointer.x >= 0 && pointer.x <= containerWidth && 
-                pointer.y >= 0 && pointer.y <= containerHeight) {
+            if (pointer.x >= x && pointer.x <= x + containerWidth && 
+                pointer.y >= y && pointer.y <= y + containerHeight) {
                 scrollY += deltaY * 0.1; // 滚动速度
                 scrollY = Phaser.Math.Clamp(scrollY, 0, maxScroll);
-                scrollContentContainer.y = -scrollY;
+                scrollContentContainer.y = y - scrollY;
             }
         });
         return {
-            x:0,
-            y:0,
+            x:x,
+            y:y,
             width:containerWidth,
             height:containerHeight
         }
@@ -256,8 +269,10 @@ export default class DrawManager {
     }
     //绘制场景
     drawScene() {
-        let rect:Rect = this.drawCharacterSBox();
-        rect = this.drawCharacterBox(rect);
+        let rect:Rect = this.drawHeader();
+        rect =  this.drawPanelBox(rect);
+        rect = this.drawCharacterSBox(rect);
+        //rect = this.drawCharacterBox(rect);
         rect = this.drawField(rect);
         this.drawRight(rect);
     }
