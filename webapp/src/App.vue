@@ -1,41 +1,41 @@
 <template>
   <div class="app">
-    <header>
-      <h1>🎴 集换式卡牌游戏</h1>
-      <p>欢迎来到卡牌游戏世界</p>
-    </header>
-    <main>
-      <HelloWorld msg="Vue 3 + Vite" />
-    </main>
+   <div id="game-container"></div>
   </div>
 </template>
 
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import Phaser from 'phaser';
+import { onMounted } from 'vue';
+import Scene from '@/script/scene';
+onMounted(() => {
+  const config = {
+    type: Phaser.AUTO,
+    width: '100%',
+    height: '100%',
+    parent: 'game-container',
+    scene: Scene,
+    scale: {
+      mode: Phaser.Scale.RESIZE,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: '100%',
+      height: '100%'
+    }
+  };
+  new Phaser.Game(config);
+});
 </script>
 
+
 <style scoped>
-.app {
-  text-align: center;
-  padding: 20px;
-}
 
-header {
-  margin-bottom: 2rem;
-}
-
-h1 {
-  color: #333;
-  font-size: 2.5rem;
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   margin: 0;
+  padding: 0;
 }
 
-p {
-  color: #666;
-  margin: 0.5rem 0 0 0;
-}
-
-main {
-  min-height: 400px;
-}
 </style>
+
