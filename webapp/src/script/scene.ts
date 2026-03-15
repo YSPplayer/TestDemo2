@@ -10,13 +10,16 @@ export default class Scene extends Phaser.Scene {
     preload() {
         // 资源加载
     }
-
-    create() {
+    drawScene() {
+        this.drawManager.clearScene();
         this.drawManager.drawScene();
+    }
+    create() {
+        this.drawScene();
     }
 
     update() {
         // 游戏循环
-         //this.drawCharacterSBox();
+        this.drawScene();
     }
 }

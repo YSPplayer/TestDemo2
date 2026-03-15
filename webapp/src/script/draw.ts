@@ -24,6 +24,81 @@ export default class DrawManager {
                  Util.ToColor('#8acfe6'));
         fieldLineBox.setOrigin(0, 0);
     }
+    //最右侧区域
+    drawRight(rect:Rect) {
+        const scene = this.scene;
+        const width = scene.scale.width;
+        const height = scene.scale.height;
+        const rightWidth = width - rect.x - rect.width;
+        const rightX = rect.x + rect.width;
+        const rightBox = scene.add.rectangle(rightX, 0, rightWidth, height,
+              Util.ToColor('#54b985'));
+         rightBox.setOrigin(0, 0);
+         
+         // 计算第3条分隔线的y位置（与drawField中的第3条分隔线对齐）
+         // drawField中的分隔线计算：lineY = y + i * (lineHeight + midlineheight)
+         // 第3条分隔线（i=2）的位置：separatorY = lineY + lineHeight = y + 2 * (lineHeight + midlineheight) + lineHeight
+         const fieldHeight = height;
+         const midlineheight = 2;
+         const numLines = 6;
+         const numSeparators = numLines - 1; // 5条分隔线
+         const lineHeight = (fieldHeight - numSeparators * midlineheight) / numLines;
+         // 第3条分隔线的y位置（索引为2）
+         const thirdSeparatorY = 2 * (lineHeight + midlineheight) + lineHeight;
+         
+         // 绘制分割线（2px宽，白色）
+         const separatorLine = scene.add.rectangle(
+             rightX,
+             thirdSeparatorY,
+             rightWidth,
+             midlineheight,
+             Util.ToColor('#ffffff')
+         );
+         separatorLine.setOrigin(0, 0);
+         
+         // 计算上下两个区域
+         const topAreaHeight = thirdSeparatorY;
+         const bottomAreaHeight = height - thirdSeparatorY - midlineheight;
+         
+         // 矩形长宽比为1.45:1，即 height = width * 1.45（长度比宽度大）
+         // 计算矩形尺寸，确保在容器内部
+         const aspectRatio = 1.45;
+         
+         // 上区域矩形
+         const topRectWidth = Math.min(rightWidth * 0.8, topAreaHeight / aspectRatio * 0.9);
+         const topRectHeight = topRectWidth * aspectRatio;
+         const topRectX = rightX + (rightWidth - topRectWidth) / 2;
+         const topRectY = (topAreaHeight - topRectHeight) / 2;
+         const topRect = scene.add.rectangle(
+             topRectX,
+             topRectY,
+             topRectWidth,
+             topRectHeight,
+             Util.ToColor('#ffffff')
+         );
+         topRect.setOrigin(0, 0);
+         
+         // 下区域矩形
+         const bottomRectWidth = Math.min(rightWidth * 0.8, bottomAreaHeight / aspectRatio * 0.9);
+         const bottomRectHeight = bottomRectWidth * aspectRatio;
+         const bottomRectX = rightX + (rightWidth - bottomRectWidth) / 2;
+         const bottomRectY = thirdSeparatorY + midlineheight + (bottomAreaHeight - bottomRectHeight) / 2;
+         const bottomRect = scene.add.rectangle(
+             bottomRectX,
+             bottomRectY,
+             bottomRectWidth,
+             bottomRectHeight,
+             Util.ToColor('#ffffff')
+         );
+         bottomRect.setOrigin(0, 0);
+         
+         return {
+            x: rightX,
+            y: 0,
+            width: rightWidth,
+            height: height
+         }
+    }
     drawField(rect:Rect)  {
          const scene = this.scene;
         const width = scene.scale.width;
@@ -47,6 +122,25 @@ export default class DrawManager {
             // 每个区域的 y 坐标：i * (lineHeight + midlineheight)
             const lineY = y + i * (lineHeight + midlineheight);
             this.drawFieldLine({ x: lineX, y: lineY, width: lineWidth, height: lineHeight });
+            
+            // 中间的4个矩形（索引1-4）添加纵向分割线，平分为5个部分
+            if (i >= 1 && i <= 4) {
+                const numVerticalLines = 4; // 4条线平分为5个部分
+                const verticalLineWidth = midlineheight; // 线宽2
+                // 计算每条纵向线的x位置
+                for (let j = 0; j < numVerticalLines; j++) {
+                    const verticalLineX = lineX + (lineWidth / 5) * (j + 1);
+                    const verticalLineRect = scene.add.rectangle(
+                        verticalLineX,
+                        lineY,
+                        verticalLineWidth,
+                        lineHeight,
+                        Util.ToColor('#ffffff')
+                    );
+                    verticalLineRect.setOrigin(0, 0);
+                }
+            }
+            
             // 分隔线：只在非最后一个区域下方绘制，使用矩形确保完全覆盖
             if (i < numSeparators) {
                 const separatorY = lineY + lineHeight;
@@ -59,6 +153,12 @@ export default class DrawManager {
                 );
                 separatorRect.setOrigin(0, 0);
             }
+        }
+        return {
+            x: x,
+            y: y,
+            width: fieldWidth,
+            height: fieldHeight
         }
     }
      //单人物框
@@ -146,10 +246,19 @@ export default class DrawManager {
             height:containerHeight
         }
     }
+    //清空场景
+    clearScene() {
+        const scene = this.scene;
+        // 移除并销毁所有子对象（包括矩形、容器、图形等）
+        scene.children.removeAll(true);
+        // 移除所有输入事件监听器
+        scene.input.removeAllListeners();
+    }
     //绘制场景
     drawScene() {
         let rect:Rect = this.drawCharacterSBox();
         rect = this.drawCharacterBox(rect);
-        this.drawField(rect);
+        rect = this.drawField(rect);
+        this.drawRight(rect);
     }
 }
