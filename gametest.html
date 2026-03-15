@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser 卡牌游戏简单案例</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2a5c4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        #game-container {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .info {
+            text-align: center;
+            margin-top: 16px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="game-container"></div>
+        <div class="info">
+            <p>点击牌库抽牌 | 点击手牌打出 | 空格键重置游戏</p>
+        </div>
+    </div>
+
+    <!-- 使用 CDN 引入 Phaser -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+
+    <script>
+        // 当页面加载完成后初始化游戏
+        window.onload = function() {
+            // 定义卡牌数据
+            const cardData = [
+                { id: 1, name: '火球术', attack: 3, color: 0xff4444 },
+                { id: 2, name: '冰霜箭', attack: 2, color: 0x44aaff },
+                { id: 3, name: '闪电链', attack: 4, color: 0xffaa44 },
+                { id: 4, name: '治疗术', attack: 1, color: 0x44ff44 },
+                { id: 5, name: '护盾', attack: 0, color: 0xaaaaaa }
+            ];
+
+            // 游戏主场景
+            class CardGameScene extends Phaser.Scene {
+                constructor() {
+                    super({ key: 'CardGameScene' });
+                    
+                    // 游戏状态
+                    this.deck = [];           // 牌库
+                    this.hand = [];            // 手牌
+                    this.battlefield = [];      // 战场
+                    
+                    // 卡牌对象容器
+                    this.deckCards = [];
+                    this.handCards = [];
+                    this.fieldCards = [];
+                }
+
+                // 预加载资源（本例使用图形绘制，无需外部资源）
+                preload() {
+                    // 这里可以加载卡牌图片，本例用图形代替
+                }
+
+                // 创建游戏元素
+                create() {
+                    // 设置背景颜色
+                    this.cameras.main.setBackgroundColor('#1a4d3e');
+                    
+                    // 绘制游戏区域分隔线
+                    this.add.line(400, 200, 0, 0, 800, 0, 0xffffff, 0.3);
+                    this.add.line(400, 400, 0, 0, 800, 0, 0xffffff, 0.3);
+                    
+                    // 添加区域标题
+                    this.add.text(20, 20, '牌库', { fontSize: '24px', fill: '#fff' });
+                    this.add.text(20, 220, '手牌', { fontSize: '24px', fill: '#fff' });
+                    this.add.text(20, 420, '战场', { fontSize: '24px', fill: '#fff' });
+                    
+                    // 初始化牌库
+                    this.initDeck();
+                    
+                    // 绘制牌库区域的卡牌
+                    this.drawDeck();
+                    
+                    // 注册键盘事件（空格键重置）
+                    this.input.keyboard.on('keydown-SPACE', () => {
+                        this.resetGame();
+                    });
+                    
+                    // 显示帮助文本
+                    this.add.text(600, 550, '空格键重置游戏', { 
+                        fontSize: '16px', 
+                        fill: '#ccc',
+                        backgroundColor: '#333',
+                        padding: { x: 10, y: 5 }
+                    });
+                }
+
+                // 初始化牌库
+                initDeck() {
+                    // 复制卡牌数据，每个卡牌出现2次
+                    this.deck = [];
+                    for (let i = 0; i < 2; i++) {
+                        cardData.forEach(card => {
+                            this.deck.push({ ...card, instanceId: `${card.id}-${i}-${Date.now()}` });
+                        });
+                    }
+                    // 随机打乱牌库
+                    this.shuffleArray(this.deck);
+                }
+
+                // 随机打乱数组
+                shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+
+                // 绘制牌库区域的卡牌
+                drawDeck() {
+                    // 清除原有的牌库卡牌
+                    if (this.deckCards.length > 0) {
+                        this.deckCards.forEach(card => card.destroy());
+                        this.deckCards = [];
+                    }
+                    
+                    // 牌库位置（x, y）
+                    const startX = 200;
+                    const startY = 100;
+                    
+                    // 显示牌库数量
+                    this.add.text(startX + 100, startY - 30, `剩余 ${this.deck.length} 张`, {
+                        fontSize: '18px',
+                        fill: '#ffd700'
+                    }).setDepth(10);
+                    
+                    // 绘制牌库中的卡牌（最多显示5张叠加效果）
+                    for (let i = 0; i < Math.min(this.deck.length, 5); i++) {
+                        // 创建卡牌图形
+                        const card = this.createCardGraphics(
+                            startX + i * 8, 
+                            startY - i * 4, 
+                            '背面', 
+                            0x4a3c2b
+                        );
+                        
+                        // 添加点击事件（抽牌）
+                        card.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 140), Phaser.Geom.Rectangle.Contains);
+                        card.on('pointerdown', () => {
+                            this.drawCard();
+                        });
+                        
+                        // 鼠标悬停效果
+                        card.on('pointerover', () => {
+                            card.setScale(1.05);
+                        });
+                        card.on('pointerout', () => {
+                            card.setScale(1);
+                        });
+                        
+                        this.deckCards.push(card);
+                    }
+                    
+                    // 如果没有卡牌，显示空牌库
+                    if (this.deck.length === 0) {
+                        const emptyCard = this.add.rectangle(startX, startY, 100, 140, 0x333333);
+                        emptyCard.setStrokeStyle(2, 0x666666);
+                        this.add.text(startX, startY - 10, '空', { 
+                            fontSize: '20px', 
+                            fill: '#999',
+                            fontStyle: 'bold'
+                        }).setOrigin(0.5);
+                        this.deckCards.push(emptyCard);
+                    }
+                }
+
+                // 抽牌
+                drawCard() {
+                    if (this.deck.length === 0) return;
+                    
+                    // 从牌库顶部抽一张牌
+                    const drawnCard = this.deck.pop();
+                    this.hand.push(drawnCard);
+                    
+                    // 更新牌库显示
+                    this.drawDeck();
+                    
+                    // 更新手牌显示
+                    this.drawHand();
+                    
+                    // 播放抽牌动画
+                    this.tweens.add({
+                        targets: this.deckCards,
+                        scaleX: 0.9,
+                        scaleY: 0.9,
+                        yoyo: true,
+                        duration: 100,
+                        ease: 'Bounce'
+                    });
+                }
+
+                // 绘制手牌
+                drawHand() {
+                    // 清除原有的手牌
+                    if (this.handCards.length > 0) {
+                        this.handCards.forEach(card => card.destroy());
+                        this.handCards = [];
+                    }
+                    
+                    // 手牌位置
+                    const startX = 150;
+                    const startY = 280;
+                    const spacing = 110;
+                    
+                    // 绘制手牌中的卡牌
+                    this.hand.forEach((card, index) => {
+                        const x = startX + index * spacing;
+                        const y = startY;
+                        
+                        // 创建卡牌图形
+                        const cardObj = this.createCardGraphics(x, y, card.name, card.color, card.attack);
+                        
+                        // 添加点击事件（出牌）
+                        cardObj.setData('cardData', card);
+                        cardObj.setData('handIndex', index);
+                        
+                        cardObj.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 140), Phaser.Geom.Rectangle.Contains);
+                        cardObj.on('pointerdown', (pointer, localX, localY, event) => {
+                            // 阻止事件冒泡，避免触发牌库点击
+                            event.stopPropagation();
+                            this.playCard(cardObj.getData('handIndex'));
+                        });
+                        
+                        // 鼠标悬停效果
+                        cardObj.on('pointerover', () => {
+                            cardObj.setScale(1.1);
+                            cardObj.y = y - 20; // 浮起效果
+                        });
+                        cardObj.on('pointerout', () => {
+                            cardObj.setScale(1);
+                            cardObj.y = y;
+                        });
+                        
+                        this.handCards.push(cardObj);
+                    });
+                }
+
+                // 出牌
+                playCard(handIndex) {
+                    if (handIndex < 0 || handIndex >= this.hand.length) return;
+                    
+                    // 从手牌移除
+                    const playedCard = this.hand.splice(handIndex, 1)[0];
+                    
+                    // 加入战场
+                    this.battlefield.push(playedCard);
+                    
+                    // 更新手牌显示
+                    this.drawHand();
+                    
+                    // 更新战场显示
+                    this.drawBattlefield();
+                    
+                    // 播放出牌动画
+                    if (this.handCards[handIndex]) {
+                        const cardObj = this.handCards[handIndex];
+                        this.tweens.add({
+                            targets: cardObj,
+                            y: 500,
+                            alpha: 0,
+                            duration: 300,
+                            ease: 'Power2',
+                            onComplete: () => {
+                                cardObj.destroy();
+                            }
+                        });
+                    }
+                }
+
+                // 绘制战场
+                drawBattlefield() {
+                    // 清除原有的战场卡牌
+                    if (this.fieldCards.length > 0) {
+                        this.fieldCards.forEach(card => card.destroy());
+                        this.fieldCards = [];
+                    }
+                    
+                    // 战场位置
+                    const startX = 200;
+                    const startY = 500;
+                    const spacing = 120;
+                    
+                    // 绘制战场中的卡牌
+                    this.battlefield.forEach((card, index) => {
+                        const x = startX + index * spacing;
+                        
+                        // 创建卡牌图形（战场上的卡牌横置表示已使用）
+                        const cardObj = this.createCardGraphics(x, startY, card.name, card.color, card.attack);
+                        cardObj.angle = 90; // 横置
+                        
+                        // 添加悬停效果
+                        cardObj.setInteractive(new Phaser.Geom.Rectangle(0, 0, 100, 140), Phaser.Geom.Rectangle.Contains);
+                        cardObj.on('pointerover', () => {
+                            cardObj.setScale(1.05);
+                        });
+                        cardObj.on('pointerout', () => {
+                            cardObj.setScale(1);
+                        });
+                        
+                        this.fieldCards.push(cardObj);
+                    });
+                }
+
+                // 创建卡牌图形
+                createCardGraphics(x, y, text, bgColor, attack = 0) {
+                    // 创建容器
+                    const container = this.add.container(x, y);
+                    
+                    // 卡牌背景
+                    const bg = this.add.rectangle(0, 0, 100, 140, bgColor);
+                    bg.setStrokeStyle(2, 0xffffff, 0.8);
+                    bg.setOrigin(0.5);
+                    
+                    // 卡牌边框装饰
+                    const inner = this.add.rectangle(0, 0, 94, 134, 0x000000, 0.2);
+                    inner.setStrokeStyle(1, 0xffffff, 0.3);
+                    inner.setOrigin(0.5);
+                    
+                    // 卡牌名称
+                    const nameText = this.add.text(0, -40, text, {
+                        fontSize: '16px',
+                        fill: '#fff',
+                        fontStyle: 'bold',
+                        align: 'center',
+                        wordWrap: { width: 90 }
+                    });
+                    nameText.setOrigin(0.5);
+                    
+                    // 攻击力
+                    if (attack > 0) {
+                        const attackCircle = this.add.circle(30, 40, 15, 0x000000, 0.7);
+                        attackCircle.setStrokeStyle(2, 0xffaa00);
+                        
+                        const attackText = this.add.text(30, 40, attack.toString(), {
+                            fontSize: '20px',
+                            fill: '#ffaa00',
+                            fontStyle: 'bold'
+                        });
+                        attackText.setOrigin(0.5);
+                        
+                        container.add([attackCircle, attackText]);
+                    }
+                    
+                    container.add([bg, inner, nameText]);
+                    
+                    return container;
+                }
+
+                // 重置游戏
+                resetGame() {
+                    // 清空所有卡牌
+                    this.deckCards.forEach(card => card.destroy());
+                    this.handCards.forEach(card => card.destroy());
+                    this.fieldCards.forEach(card => card.destroy());
+                    
+                    this.deckCards = [];
+                    this.handCards = [];
+                    this.fieldCards = [];
+                    
+                    // 重置状态
+                    this.deck = [];
+                    this.hand = [];
+                    this.battlefield = [];
+                    
+                    // 重新初始化
+                    this.initDeck();
+                    this.drawDeck();
+                    
+                    // 播放重置动画
+                    this.cameras.main.flash(300, 100, 200, 100);
+                }
+            }
+
+            // 游戏配置
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'game-container',
+                scene: CardGameScene,
+                scale: {
+                    mode: Phaser.Scale.FIT,
+                    autoCenter: Phaser.Scale.CENTER_BOTH
+                }
+            };
+
+            // 创建游戏实例
+            new Phaser.Game(config);
+        };
+    </script>
+</body>
+</html>
