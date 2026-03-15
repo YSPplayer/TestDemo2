@@ -165,10 +165,10 @@ export default class DrawManager {
         const scene = this.scene;
         const width = scene.scale.width;
         const height = scene.scale.height;
-        const x = 0;
-        const y = rect.y + rect.height;
+        const x = rect.x + rect.width;
+        const y = rect.y;
         const panelWidth = width * 0.2;
-        const panelHeight = height;
+        const panelHeight = height - rect.y;
         const characterBox = scene.add.rectangle(x, y, panelWidth, panelHeight,
               Util.ToColor('#cca7d7'));
         characterBox.setOrigin(0, 0);
@@ -220,9 +220,9 @@ export default class DrawManager {
         const width = scene.scale.width;
         const height = scene.scale.height;
         const containerWidth = width * 0.1;
-        const containerHeight = height;
-        const x = rect.x + rect.width;
-        const y = rect.y;
+        const containerHeight = height - rect.y - rect.height;
+        const x = 0;
+        const y = rect.y + rect.height;
         // 外框容器（可视区域）
         const container = scene.add.rectangle(x, y, containerWidth, containerHeight,
              Util.ToColor('#477496'));
@@ -286,8 +286,8 @@ export default class DrawManager {
     //绘制场景
     drawScene() {
         let rect:Rect = this.drawHeader();
-        rect =  this.drawPanelBox(rect);
         rect = this.drawCharacterSBox(rect);
+        rect = this.drawPanelBox(rect);
         //rect = this.drawCharacterBox(rect);
         rect = this.drawField(rect);
         this.drawRight(rect);
