@@ -1,11 +1,6 @@
 import Phaser from 'phaser';
 import Util from './util';
-export interface Rect {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
+import { Rect } from './geometry';
 export default class DrawManager {
     scene: Phaser.Scene;
      constructor(scene:Phaser.Scene) {
