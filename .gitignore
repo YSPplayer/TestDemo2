@@ -9,3 +9,7 @@ MyCard/ProjectSettings/
 MyCard/Temp/
 MyCard/UserSettings/
 
+MyCard/.vs/
+MyCard/obj/
+MyCard/.vsconfig
+*.meta
