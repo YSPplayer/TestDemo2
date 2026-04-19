@@ -1,18 +1,26 @@
+using Assets.Resource.Script.Client;
+using Assets.Resource.Script.Client.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+	EngineUi engineUi;
+	void Awake()
+	{
+		engineUi = GetComponent<EngineUi>();
+	}
+
+	void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
-    }
+		engineUi.Draw();
+
+	}
 }

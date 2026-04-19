@@ -3,18 +3,18 @@ namespace Assets.Resource.Script.Core
 {
 	public class MonsterCard : Card
 	{
-		public int HP { get; set; } // 生命力
-		public int Attack { get; set; } // 攻击力
-		public int Defense { get; set; } // 守备力
-		public int Shield { get; set; } // 护盾值
+		public int Atk { get; set; } //攻击力
+		public int Hp { get; set; } //生命值
+		public int Def { get; set; } //防御力
+		public int Shd { get; set; } //护盾
 
-		public MonsterCard(long code, string name, string description, int hp, int attack, int defense, int shield)
-			: base(code, name, description)
+		public MonsterCard(long code, string name, string description,CardType cardType, int atk, int hp, int def,int shd)
+			: base(code, name, description, cardType)
 		{
-			HP = hp;
-			Attack = attack;
-			Defense = defense;
-			Shield = shield;
+			Atk = atk;
+			Hp = hp;
+			Def = def;
+			Shd = shd;
 		}
 	}
 }
