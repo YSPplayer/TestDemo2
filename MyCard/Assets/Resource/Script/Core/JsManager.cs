@@ -20,12 +20,14 @@ namespace Assets.Resource.Script.Core
 		//注入js脚本函数
 		public void SetEnvFunction()
 		{
-			jsEngine.SetValue("_loadScript", new Action<string>(scriptPath =>
+			jsEngine.SetValue("_loadScript", new Action<string>(scriptName =>
 			{
-				if (File.Exists(scriptPath))
+				string fullPath = Path.Combine(Application.dataPath, "Resource/CardScript", scriptName);
+				if (File.Exists(fullPath))
 				{
-					string code = File.ReadAllText(scriptPath);
+					string code = File.ReadAllText(fullPath);
 					jsEngine.Execute(code);
+					Log.Debug($"加载成功：{scriptName}");
 				}
 			}));
 			jsEngine.SetValue("console", new
@@ -35,22 +37,26 @@ namespace Assets.Resource.Script.Core
 		}
 		public List<Card> ExecuteScripts()
 		{
-			ExecuteScript("const");
+			ExecuteScript("env");
 			List<Card> cards = new List<Card>();
-			foreach (var script in scriptsMap.Values)
+			foreach (var name in scriptsMap.Keys)
 			{
-				Card card = ExecuteScriptWithCard(script);
+				Card card = ExecuteScriptWithCard(name);
 				if(card != null) cards.Add(card);
 			}
 			return cards;
 		}
 		public void LoadScript() 
 		{
-			TextAsset[] scripts = Resources.LoadAll<TextAsset>("CardScript");
-			foreach (var script in scripts)
+			//TextAsset[] scripts = Resources.LoadAll<TextAsset>("CardScript");
+			string[] scriptPaths = Directory.GetFiles(Application.dataPath + "/Resource/CardScript", "*.js");
+			foreach (var scriptPath in scriptPaths)
 			{
-				string scriptName = Path.GetFileNameWithoutExtension(script.name);
-				scriptsMap[scriptName] = script.text;
+				// 从文件路径获取文件名（不含扩展名）
+				string scriptName = Path.GetFileNameWithoutExtension(scriptPath);
+				// 读取文件内容
+				string scriptContent = File.ReadAllText(scriptPath);
+				scriptsMap[scriptName] = scriptContent;
 				Log.Debug($"加载脚本: {scriptName}");
 			}
 		}
@@ -88,12 +94,12 @@ namespace Assets.Resource.Script.Core
 
 				if (jsEngine.Evaluate($"typeof initCard !== 'undefined'").AsBoolean())
 				{
-					var baseStats = new
+					var args = new
 					{
 						code
 					};
-					jsEngine.SetValue("baseStats", baseStats);
-					var result = jsEngine.Invoke("initCard", baseStats);
+					jsEngine.SetValue("args", args);
+					var result = jsEngine.Invoke("initCard", args);
 					if (result.IsObject()) 
 						return ToCard(result.AsObject());
 				}

@@ -12,15 +12,19 @@ namespace Assets.Resource.Script.Client
 	/// </summary>
 	public class RunDemo
 	{
+		private static JsManager jsManager = new JsManager();
+		private static List<Card> jscards = null;
 		private static List<Card> CreateMonsterCard()
 		{
-			JsManager jsManager = new JsManager();
-			jsManager.LoadScript();
-			List<Card> cards = jsManager.ExecuteScripts();
-			//List<Card> cards = new List<Card>();
+			if (jscards == null)
+			{
+				jsManager.LoadScript();
+				jscards = jsManager.ExecuteScripts();
+			}
+			List<Card> cards = new List<Card>();
 			for (int i = 0; i < 30; ++i)
 			{
-				Card card = new Card(cards[0]);
+				Card card = new Card(jscards[0]);
 				cards.Add(card);
 			}
 			return cards;
