@@ -14,7 +14,7 @@ namespace Assets.Resource.Script.Client
 	{
 		private static JsManager jsManager = new JsManager();
 		private static List<Card> jscards = null;
-		private static TcpServer tcpServer = new TcpServer();
+		private static Duel duel = null;
 		private static List<Card> CreateMonsterCard()
 		{
 			if (jscards == null)
@@ -36,14 +36,11 @@ namespace Assets.Resource.Script.Client
 			player.Deck = new Deck(CreateMonsterCard());
 			return player;
 		}
-		public static void RunServer()
-		{
-			tcpServer.Start();
-		}
+
 		public static Duel CreateDuel()
 		{
-			RunServer();
-			Duel duel = new Duel();
+			duel = new Duel();
+			duel.StartServer();
 			//每一个角色30张卡组
 			Player player0 = CreatePlayer();
 			Player player1 = CreatePlayer();
@@ -53,7 +50,7 @@ namespace Assets.Resource.Script.Client
 		}
 		public static void Destory()
 		{
-			tcpServer.Stop();
+			duel.StopServer();
 		}
 	}
 }

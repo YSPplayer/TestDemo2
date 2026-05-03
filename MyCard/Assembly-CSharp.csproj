@@ -61,9 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resource\Script\Client\Unity\EngineUi.cs" />
-    <Compile Include="Assets\Resource\Script\Core\DuelProcess.cs" />
     <Compile Include="Assets\Resource\Script\Core\Duel.cs" />
+    <Compile Include="Assets\Resource\Script\Core\Mode\PlayerMode2V2.cs" />
+    <Compile Include="Assets\Resource\Script\Core\JsonManage.cs" />
     <Compile Include="Assets\Resource\Script\Core\Socket\TcpCilent.cs" />
+    <Compile Include="Assets\Resource\Script\Core\Mode\PlayMode.cs" />
     <Compile Include="Assets\Resource\Script\Core\Card.cs" />
     <Compile Include="Assets\Resource\Script\Client\RunDemo.cs" />
     <Compile Include="Assets\Resource\Script\Core\Socket\TcpServer.cs" />

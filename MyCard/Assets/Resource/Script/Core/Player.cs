@@ -13,18 +13,32 @@ namespace Assets.Resource.Script.Core
 		public Deck Deck { get; set; } //玩家卡组
 		public List<Card> Hands { get; set; } //玩家手卡
 
-		private TcpCilent tcpCilent = null;
+		public List<Card> Grave { get; set; } //弃牌区 
+
+		public bool IsReceive { get; set; } //客户端是否接收到服务器信息
+	private TcpCilent tcpCilent = null;
 		public Player() {
 			Name = "";
 			Deck = new Deck();
 			Hands = new List<Card>();
+			Grave = new List<Card>();
 			tcpCilent = new TcpCilent();
 			//连接客户端
 			tcpCilent.Connect();
+			IsReceive = true;
 		}
 		public int GetDeckCount()
 		{
 			return Deck.Count();
+		}
+
+		public int GetHandCount()
+		{
+			return Hands.Count();
+		}
+		public int GetGraveCount()
+		{ 
+			return Grave.Count();
 		}
 	}
 }

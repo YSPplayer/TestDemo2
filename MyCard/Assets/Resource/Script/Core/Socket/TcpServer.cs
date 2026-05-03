@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
-/*
- 消息机制定义:1.后续消息队列长度 2.消息类型 3.数据
- */
+
 namespace Assets.Resource.Script.Core.Socket
 {
 	public class TcpServer
@@ -18,18 +17,52 @@ namespace Assets.Resource.Script.Core.Socket
 		private bool isRunning;
 		private List<TcpClient> clients;
 		private object lockclient;
+		private Action<TcpClient, string> processMessageFunc;
 		public TcpServer()
 		{
 			listener = null;
 			port = 9093;
 			isRunning = false;
 			lockclient = new object();
+			processMessageFunc = null;
+		}
+		public void BindMessageFunc(Action<TcpClient, string> processMessageFunc)
+		{ 
+			this.processMessageFunc = processMessageFunc;
 		}
 		public void Stop()
 		{
 			listener.Stop();
 			isRunning = false;
 			Log.Debug("服务已经关闭");
+		}
+		/// <summary>
+		/// 给当前的所有客户端进行广播通知
+		/// </summary>
+		/// <param name="message"></param>
+		/// <returns></returns>
+		public void BroadcastAll(string message)
+		{
+			byte[] data = Encoding.UTF8.GetBytes(message);
+			lock (lockclient)
+			{
+				foreach (var client in clients)
+				{
+					if (client == null) continue;
+					try
+					{
+						if (client.Connected)
+						{
+							var stream = client.GetStream();
+							stream.Write(data, 0, data.Length);
+						}
+					}
+					catch (Exception e)
+					{
+						Log.Debug($"发送给客户端失败：{e.Message}");
+					}
+				}
+			}
 		}
 		/// <summary>
 		/// 每一个客户端触发消息的时候调用
@@ -41,10 +74,37 @@ namespace Assets.Resource.Script.Core.Socket
 			using (client)
 			using (var stream = client.GetStream())
 			{
-				var buffer = new byte[4];//先读取头数据
-				while (isRunning && client != null &&
-					client.Connected) { 
-					
+				var buffer = new byte[4096];
+
+				while (isRunning && client != null && client.Connected)
+				{
+					try
+					{
+						// 异步读取（不阻塞线程，但当前方法会挂起等待）
+						int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+						if (bytesRead == 0)
+						{
+							// 客户端正常关闭连接
+							Console.WriteLine("客户端已断开连接");
+							break;
+						}
+						// 处理接收到的数据
+						byte[] receivedData = new byte[bytesRead];
+						Array.Copy(buffer, 0, receivedData, 0, bytesRead);
+						// 处理消息
+						if(processMessageFunc != null) 
+							processMessageFunc(client,Encoding.UTF8.GetString(receivedData));
+					}
+					catch (IOException ex)
+					{
+						// 网络异常或连接断开
+						Console.WriteLine($"连接异常: {ex.Message}");
+						break;
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"处理消息错误: {ex.Message}");
+					}
 				}
 			}
 			RemoveClinet(client);
