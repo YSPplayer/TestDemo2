@@ -16,5 +16,15 @@ namespace Assets.Resource.Script.Core
 			Def = def;
 			Shd = shd;
 		}
+
+		// 拷贝构造函数
+		public MonsterCard(MonsterCard other)
+			: base(other.Code, other.Name, other.Description, other.CardType)
+		{
+			Atk = other.Atk;
+			Hp = other.Hp;
+			Def = other.Def;
+			Shd = other.Shd;
+		}
 	}
 }

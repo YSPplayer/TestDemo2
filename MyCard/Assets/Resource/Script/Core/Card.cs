@@ -16,5 +16,14 @@ namespace Assets.Resource.Script.Core
 			CardType = cardType;
 
 		}
+
+		// 拷贝构造函数
+		public Card(Card other)
+		{
+			Code = other.Code;
+			Name = other.Name;
+			Description = other.Description;
+			CardType = other.CardType;
+		}
 	}
 }

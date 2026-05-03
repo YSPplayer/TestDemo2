@@ -14,11 +14,13 @@ namespace Assets.Resource.Script.Client
 	{
 		private static List<Card> CreateMonsterCard()
 		{
-			List<Card> cards = new List<Card>();
+			JsManager jsManager = new JsManager();
+			jsManager.LoadScript();
+			List<Card> cards = jsManager.ExecuteScripts();
+			//List<Card> cards = new List<Card>();
 			for (int i = 0; i < 30; ++i)
 			{
-				MonsterCard card = new MonsterCard(1000, "零星小偷",
-					"出牌阶段，直接登场", CardType.Monster, 9, 7, 4, 3);
+				Card card = new Card(cards[0]);
 				cards.Add(card);
 			}
 			return cards;

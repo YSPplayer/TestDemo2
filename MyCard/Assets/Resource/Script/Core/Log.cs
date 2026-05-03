@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,6 @@ namespace Assets.Resource.Script.Core
 		public Log() { }
 		public static void Debug<T>(T message)
 		{ 
-			Console.WriteLine(message);
 			UnityEngine.Debug.Log(message);
 		}
 	}
