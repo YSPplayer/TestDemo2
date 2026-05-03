@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Resource\Script\Client\Unity\EngineUi.cs" />
+    <Compile Include="Assets\Resource\Script\Core\DuelProcess.cs" />
     <Compile Include="Assets\Resource\Script\Core\Duel.cs" />
     <Compile Include="Assets\Resource\Script\Core\Socket\TcpCilent.cs" />
     <Compile Include="Assets\Resource\Script\Core\Card.cs" />

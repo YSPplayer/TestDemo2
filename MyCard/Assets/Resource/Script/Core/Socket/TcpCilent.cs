@@ -29,7 +29,8 @@ namespace Assets.Resource.Script.Core.Socket
 		{
 			try
 			{
-				Client.Connect(IPAddress.Any, Port);
+				IPAddress localIp = IPAddress.Parse("127.0.0.1");
+				Client.Connect(localIp, Port);
 				Stream = Client.GetStream();
 				Log.Debug("客户端连接成功！");
 				return true;

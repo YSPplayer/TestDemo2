@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Assets.Resource.Script.Core.Socket;
 namespace Assets.Resource.Script.Client
 {
 	/// <summary>
@@ -14,6 +14,7 @@ namespace Assets.Resource.Script.Client
 	{
 		private static JsManager jsManager = new JsManager();
 		private static List<Card> jscards = null;
+		private static TcpServer tcpServer = new TcpServer();
 		private static List<Card> CreateMonsterCard()
 		{
 			if (jscards == null)
@@ -35,8 +36,13 @@ namespace Assets.Resource.Script.Client
 			player.Deck = new Deck(CreateMonsterCard());
 			return player;
 		}
+		public static void RunServer()
+		{
+			tcpServer.Start();
+		}
 		public static Duel CreateDuel()
-		{ 
+		{
+			RunServer();
 			Duel duel = new Duel();
 			//每一个角色30张卡组
 			Player player0 = CreatePlayer();
@@ -44,6 +50,10 @@ namespace Assets.Resource.Script.Client
 			duel.Players.Add(player0);
 			duel.Players.Add(player0);
 			return duel;
+		}
+		public static void Destory()
+		{
+			tcpServer.Stop();
 		}
 	}
 }

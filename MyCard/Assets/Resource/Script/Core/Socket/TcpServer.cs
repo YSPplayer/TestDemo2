@@ -29,6 +29,7 @@ namespace Assets.Resource.Script.Core.Socket
 		{
 			listener.Stop();
 			isRunning = false;
+			Log.Debug("服务已经关闭");
 		}
 		/// <summary>
 		/// 每一个客户端触发消息的时候调用
@@ -72,9 +73,11 @@ namespace Assets.Resource.Script.Core.Socket
 			{
 				try
 				{
-					listener = new TcpListener(IPAddress.Any, port);
+					IPAddress localIp = IPAddress.Parse("127.0.0.1");
+					listener = new TcpListener(localIp, port);
 					listener.Start();
 					isRunning = true;
+					Log.Debug($"服务器已启动，端口:{port}");
 				}
 				catch (Exception e)
 				{
@@ -89,6 +92,10 @@ namespace Assets.Resource.Script.Core.Socket
 						{
 							//有新的客户端连接的时候触发
 							var client = await listener.AcceptTcpClientAsync();
+							var endPoint = client.Client.RemoteEndPoint as System.Net.IPEndPoint;
+							string clientIP = endPoint.Address.ToString();
+							int clientPort = endPoint.Port;
+							Console.WriteLine($"客户端连接: {clientIP}:{clientPort}");
 							PushClient(client);
 							_ = Task.Run(()=> HandleClientAsync(client));
 						}

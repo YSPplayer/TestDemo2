@@ -17,8 +17,12 @@ public class Main : MonoBehaviour
     {
         
     }
+	void OnApplicationQuit()
+	{ 
 
-    void Update()
+	}
+
+	void Update()
     {
 		engineUi.Draw();
 
