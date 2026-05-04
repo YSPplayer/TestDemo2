@@ -15,9 +15,16 @@ namespace Assets.Resource.Script.Core.Mode
 		{
 	
 		}
-		protected override void ProcessClientReceive(TcpClient cilent, string msg)
+		protected override void ProcessClientReceive(Player palyer, string msg)
 		{
-			DuelMsg duelMsg = JsonManage.ToObj<DuelMsg>(msg);
+			ClientMsg clientMsg = JsonManage.ToObj<ClientMsg>(msg);
+			ClientType type = (ClientType)clientMsg.type;
+			ClientCode code = (ClientCode)clientMsg.state;
+			if (code != ClientCode.OK) return;
+			if (type == ClientType.GameStart && duel.IsAllReceive())
+			{
+				ProcessDuel();
+			}
 		}
 		//决斗过程
 		protected override void ProcessDuel()
@@ -37,10 +44,10 @@ namespace Assets.Resource.Script.Core.Mode
 				deck0.Shuffle();
 				deck1.Shuffle();
 				//先给玩家A发牌，等待玩家A准备完毕之后再给玩家B发牌
-				List<Card> deckcards = deck0.GetTopCards(4);
-				DuelMsg msg = CreateDuelMsg(phase, duel.PlayerToInt(player0), deckcards);
+				List<Card> deckcards = deck0.Draw(4);
+				DuelMsg msg = CreateDuelMsg(phase, player0.Id, deckcards);
 				//初始化4张手卡
-				duel.BroadcastAll(JsonManage.ToString(msg));
+				duel.BroadcastAll(msg);
 			}
 		}
 	}

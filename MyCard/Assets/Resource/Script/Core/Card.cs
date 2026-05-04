@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 namespace Assets.Resource.Script.Core
 {
 	public class Card
 	{
+		public static Dictionary<long, Card> Datas = new Dictionary<long, Card>();
 		public long Code { get; set; } // 卡牌编号
 		public string Name { get; set; } // 卡牌名称
 

@@ -42,7 +42,11 @@ namespace Assets.Resource.Script.Core
 			foreach (var name in scriptsMap.Keys)
 			{
 				Card card = ExecuteScriptWithCard(name);
-				if(card != null) cards.Add(card);
+				if (card != null) {
+					cards.Add(card);
+					Card.Datas[card.Code] = card;
+				} 
+				
 			}
 			return cards;
 		}

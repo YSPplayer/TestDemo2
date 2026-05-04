@@ -7,10 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.PackageManager;
 
 namespace Assets.Resource.Script.Core.Socket
 {
-	public class TcpServer
+	public class GameServer
 	{
 		private TcpListener listener;
 		private int port;
@@ -18,12 +19,13 @@ namespace Assets.Resource.Script.Core.Socket
 		private List<TcpClient> clients;
 		private object lockclient;
 		private Action<TcpClient, string> processMessageFunc;
-		public TcpServer()
+		public GameServer()
 		{
 			listener = null;
 			port = 9093;
 			isRunning = false;
 			lockclient = new object();
+			clients = new List<TcpClient>();
 			processMessageFunc = null;
 		}
 		public void BindMessageFunc(Action<TcpClient, string> processMessageFunc)
@@ -43,6 +45,7 @@ namespace Assets.Resource.Script.Core.Socket
 		/// <returns></returns>
 		public void BroadcastAll(string message)
 		{
+			Log.Debug($"服务器广播发送消息：{message}");
 			byte[] data = Encoding.UTF8.GetBytes(message);
 			lock (lockclient)
 			{
@@ -69,9 +72,8 @@ namespace Assets.Resource.Script.Core.Socket
 		/// </summary>
 		/// <param name="client"></param>
 		/// <returns></returns>
-		private async Task HandleClientAsync(TcpClient client) 
+		private void HandleClient(TcpClient client) 
 		{
-			using (client)
 			using (var stream = client.GetStream())
 			{
 				var buffer = new byte[4096];
@@ -81,11 +83,11 @@ namespace Assets.Resource.Script.Core.Socket
 					try
 					{
 						// 异步读取（不阻塞线程，但当前方法会挂起等待）
-						int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+						int bytesRead = stream.Read(buffer, 0, buffer.Length);
 						if (bytesRead == 0)
 						{
 							// 客户端正常关闭连接
-							Console.WriteLine("客户端已断开连接");
+							Log.Debug("客户端已断开连接");
 							break;
 						}
 						// 处理接收到的数据
@@ -98,12 +100,12 @@ namespace Assets.Resource.Script.Core.Socket
 					catch (IOException ex)
 					{
 						// 网络异常或连接断开
-						Console.WriteLine($"连接异常: {ex.Message}");
+						Log.Debug($"连接异常: {ex.Message}");
 						break;
 					}
 					catch (Exception ex)
 					{
-						Console.WriteLine($"处理消息错误: {ex.Message}");
+						Log.Debug($"处理消息错误: {ex.Message}");
 					}
 				}
 			}
@@ -116,6 +118,7 @@ namespace Assets.Resource.Script.Core.Socket
 				if (!clients.Contains(client))
 				{
 					clients.Remove(client);
+					client.Dispose();
 				}
 			}
 		}
@@ -155,9 +158,9 @@ namespace Assets.Resource.Script.Core.Socket
 							var endPoint = client.Client.RemoteEndPoint as System.Net.IPEndPoint;
 							string clientIP = endPoint.Address.ToString();
 							int clientPort = endPoint.Port;
-							Console.WriteLine($"客户端连接: {clientIP}:{clientPort}");
+							Log.Debug($"客户端连接: {clientIP}:{clientPort}");
 							PushClient(client);
-							_ = Task.Run(()=> HandleClientAsync(client));
+							_ = Task.Run(()=> HandleClient(client));
 						}
 						catch (ObjectDisposedException)
 						{

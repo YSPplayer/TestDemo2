@@ -30,7 +30,7 @@ namespace Assets.Resource.Script.Core
 				Swap(Cards, i, j);
 			}
 		}
-		public List<Card> GetTopCards(int count)
+		public List<Card> Draw(int count)
 		{
 			if (count <= 0) return new List<Card>();
 			if (count >= Cards.Count)
